@@ -182,4 +182,18 @@ class MortageCalculationTest extends TestCase
                 "currency" => "EUR"
             ]);
     }
+
+    /**
+     * Testa exportação da tabela de amortização
+     */
+    public function test_mortage_amortization_schedule_export(): void
+    {
+        $response = $this->postJson('/api/mortage/export', [
+            'loan_amount' => 80000.00,
+            'duration_years' => 10,
+            'rate' => 4.5,
+            'type' => 'fixed',
+        ]);
+
+    }
 }
