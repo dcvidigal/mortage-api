@@ -46,4 +46,21 @@ class MortageCalculatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->mortageCalculator->calculateMontlyPayment(-10000.00, 5.0, 360);
     }
+
+    /**
+     * Testa a geração da tabela de amortização.
+     */
+    public function test_generate_amortization_schedule(): void
+    {
+        $loanAmmount = 10000.00;
+        $annualRate = 5.0;
+        $months = 12;
+
+        $result = $this->mortageCalculator->generateAmortizationSchedule($loanAmmount, $annualRate, $months);
+
+        $this->assertArrayHasKey('monthly_payment', $result);
+        $this->assertArrayHasKey('total_interest', $result);
+        $this->assertArrayHasKey('schedule', $result);
+        $this->assertCount(12, $result['schedule']);
+    }
 }

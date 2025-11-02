@@ -31,4 +31,30 @@ class MortageCalculator
 
         return round($monthlyPayment, 2);
     }
+
+    public function generateAmortizationSchedule(float $loanAmmount, float $annualRate, int $months): array
+    {
+        $schedule = [];
+        $monthlyRate = $annualRate / 100 / 12;
+
+        $monthlyPayment = $this->calculateMontlyPayment($loanAmmount, $annualRate, $months);
+
+        $remainingBalance = $loanAmmount;
+        $totalInterest = 0.0;
+        for( $month = 1; $month <= $months; $month++ ) {
+            $interestPayment = round($remainingBalance * $monthlyRate, 2);
+            $principalPayment = round($monthlyPayment - $interestPayment, 2);
+            $remainingBalance = round($remainingBalance - $principalPayment, 2);
+            $totalInterest += $interestPayment;
+
+            $schedule[] = [
+                'month' => $month,
+                'principal_payment' => $principalPayment,
+                'interest_payment' => $interestPayment,
+                'remaining_balance' => max($remainingBalance, 0),
+            ];
+        }
+
+        return ['monthly_payment' => $monthlyPayment, 'total_interest' => round($totalInterest, 2), 'schedule' => $schedule];
+    }
 }

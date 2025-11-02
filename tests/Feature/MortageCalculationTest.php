@@ -119,4 +119,40 @@ class MortageCalculationTest extends TestCase
             ->assertJsonValidationErrors(['loan_amount', 'type']);
 
     }
+    /**
+     * Testa a geração da tabela de amortização.
+     */
+    public function test_mortage_amortization_schedule(): void
+    {
+        $response = $this->postJson('/api/mortage/amortization-schedule', [
+            'loan_amount' => 10000.00,
+            'duration_years' => 1,
+            'rate' => 5.0,
+            'type' => 'fixed',
+        ]);
+
+        $response
+            ->assertStatus(200)
+           ->assertJsonStructure([
+                'monthlyPayment',
+                'loan_amount',
+                'duration_months',
+                'annual_rate',
+                'method',
+                'currency',
+                'metadata' => [
+                    'calculated_at',
+                    'formula',
+                ],
+                'total_interest',
+                'schedule' => [
+                    '*' => [
+                        'month',
+                        'principal_payment',
+                        'interest_payment',
+                        'remaining_balance',
+                    ],
+                ],
+            ]);
+    }
 }
