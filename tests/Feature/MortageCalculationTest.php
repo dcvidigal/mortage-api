@@ -155,4 +155,31 @@ class MortageCalculationTest extends TestCase
                 ],
             ]);
     }
+
+    /*
+     * Testa cálculo com spread em taxa variável
+     */
+    public function test_variable_rate_mortage_calculation_with_spread(): void
+    {
+        $response = $this->postJson('/api/mortage/calculate-spread', [
+            'loan_amount' => 120000,
+            'duration_years' => 20,
+            'index_rate' => 1.8,
+            'spread' => 1.2,
+            'type' => 'variable',
+        ]);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson([
+               'monthlyPayment' => 665.52,
+                'loan_amount' => 120000.0,
+                'duration_months' => 240,
+                'index_rate' => 1.8,
+                'spread' => 1.2,
+                'annual_rate' => 3.0,
+                'method' => 'french_amortization',
+                "currency" => "EUR"
+            ]);
+    }
 }

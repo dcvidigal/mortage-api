@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class MortageController extends Controller
 {
     protected MortageCalculator $mortageCalculator;
+
     public function __construct()
     {
         $this->mortageCalculator = new MortageCalculator();
@@ -26,36 +27,13 @@ class MortageController extends Controller
             'spread' => 'required_if:type,variable|numeric|min:0',
         ]);
 
-        if(empty($validated['duration_years']) && empty($validated['duration_months'])) {
+        if (empty($validated['duration_years']) && empty($validated['duration_months'])) {
             throw ValidationException::withMessages([
                 'duration' => 'Deve indicar a duração do empréstimo em anos e/ou meses.',
             ]);
         }
 
-        $months = $validated['duration_months'] ?? $validated['duration_years'] * 12;
-
-        $annualRate = $validated['type'] == 'variable'
-            ? $validated['index_rate'] + $validated['spread']
-            : $validated['rate'];
-
-        $monthlyPayment = $this->mortageCalculator->calculateMontlyPayment(
-            $validated['loan_amount'],
-            $annualRate,
-            $months
-        );
-
-        return response()->json([
-            'monthlyPayment' => $monthlyPayment,
-            'loan_amount' => (float) $validated['loan_amount'],
-            'duration_months' => $months,
-            'annual_rate' => (float) $annualRate,
-            'method' => 'french_amortization',
-            "currency" => "EUR",
-            "metadata" => [
-                "calculated_at" => now()->toIso8601String(),
-                "formula" => "M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1"
-            ],
-        ]);
+        return $this->performCalculation($validated);
     }
 
     public function amortizationSchedule(Request $request)
@@ -70,7 +48,7 @@ class MortageController extends Controller
             'spread' => 'required_if:type,variable|numeric|min:0',
         ]);
 
-        if(empty($validated['duration_years']) && empty($validated['duration_months'])) {
+        if (empty($validated['duration_years']) && empty($validated['duration_months'])) {
             throw ValidationException::withMessages([
                 'duration' => 'Deve indicar a duração do empréstimo em anos e/ou meses.',
             ]);
@@ -90,9 +68,9 @@ class MortageController extends Controller
 
         return response()->json([
             'monthlyPayment' => $scheduleData['monthly_payment'],
-            'loan_amount' => (float) $validated['loan_amount'],
+            'loan_amount' => (float)$validated['loan_amount'],
             'duration_months' => $months,
-            'annual_rate' => (float) $annualRate,
+            'annual_rate' => (float)$annualRate,
             'method' => 'french_amortization',
             "currency" => "EUR",
             "metadata" => [
@@ -101,6 +79,62 @@ class MortageController extends Controller
             ],
             'total_interest' => $scheduleData['total_interest'],
             'schedule' => $scheduleData['schedule']
+        ]);
+    }
+
+    public function calculateWithSpread(Request $request)
+    {
+        $validated = $request->validate([
+            'loan_amount' => 'required|numeric|min:0.01',
+            'duration_years' => 'nullable|integer|min:1',
+            'duration_months' => 'nullable|integer|min:0',
+            'type' => 'required|in:fixed,variable',
+            'rate' => 'required_if:type,fixed|numeric|min:0',
+            'index_rate' => 'required_if:type,variable|numeric|min:0',
+            'spread' => 'required_if:type,variable|numeric|min:0',
+        ]);
+
+        if (empty($validated['duration_years']) && empty($validated['duration_months'])) {
+            throw ValidationException::withMessages([
+                'duration' => 'Deve indicar a duração do empréstimo em anos e/ou meses.',
+            ]);
+        }
+
+        $result = $this->performCalculation($validated);
+        $result['index_rate'] = $validated['type'] == 'variable' ? (float)$validated['index_rate'] : null;
+        $result['spread'] = $validated['type'] == 'variable' ? (float)$validated['spread'] : null;
+        return response()->json($result);
+    }
+
+    /**
+     * @param array $validated
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function performCalculation(array $validated): \Illuminate\Http\JsonResponse
+    {
+        $months = $validated['duration_months'] ?? $validated['duration_years'] * 12;
+
+        $annualRate = $validated['type'] == 'variable'
+            ? $validated['index_rate'] + $validated['spread']
+            : $validated['rate'];
+
+        $monthlyPayment = $this->mortageCalculator->calculateMontlyPayment(
+            $validated['loan_amount'],
+            $annualRate,
+            $months
+        );
+
+        return response()->json([
+            'monthlyPayment' => $monthlyPayment,
+            'loan_amount' => (float)$validated['loan_amount'],
+            'duration_months' => $months,
+            'annual_rate' => (float)$annualRate,
+            'method' => 'french_amortization',
+            "currency" => "EUR",
+            "metadata" => [
+                "calculated_at" => now()->toIso8601String(),
+                "formula" => "M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1"
+            ],
         ]);
     }
 }

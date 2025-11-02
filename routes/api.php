@@ -4,3 +4,4 @@ use App\Http\Controllers\MortageController;
 
 Route::post('/mortage/calculate', [MortageController::class, 'calculate']);
 Route::post('/mortage/amortization-schedule', [MortageController::class, 'amortizationSchedule']);
+Route::post('/mortage/calculate-spread', [MortageController::class, 'calculateWithSpread']);
