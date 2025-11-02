@@ -1,0 +1,424 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Calculadora de Empréstimos",
+        "description": "API para cálculo de prestações mensais e geração de tabelas de amortização de empréstimos.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api": {},
+        "/api/mortage/calculate": {
+            "post": {
+                "tags": [
+                    "Mortgage"
+                ],
+                "summary": "Calcula a prestação mensal",
+                "description": "Calcula o valor da prestação mensal com base no tipo de taxa (fixa ou variável) e prazo.",
+                "operationId": "cd231a32fb090c2f7c38264811701cbf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "description": "Montante do empréstimo (€)",
+                                        "type": "number",
+                                        "minimum": 0.01,
+                                        "example": 150000
+                                    },
+                                    "duration_years": {
+                                        "description": "Prazo do empréstimo em anos",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 15,
+                                        "nullable": true
+                                    },
+                                    "duration_months": {
+                                        "description": "Prazo do empréstimo em meses",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 180,
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "description": "Tipo de taxa — fixa ou variável",
+                                        "type": "string",
+                                        "enum": [
+                                            "fixed",
+                                            "variable"
+                                        ],
+                                        "example": "fixed"
+                                    },
+                                    "rate": {
+                                        "description": "TAN fixa (%). Obrigatório se type=fixed",
+                                        "type": "number",
+                                        "example": 3.5,
+                                        "nullable": true
+                                    },
+                                    "index_rate": {
+                                        "description": "Euribor (%). Obrigatório se type=variable",
+                                        "type": "number",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "spread": {
+                                        "description": "Spread do banco (%). Obrigatório se type=variable",
+                                        "type": "number",
+                                        "example": 1.5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cálculo efetuado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "monthlyPayment": {
+                                            "type": "number",
+                                            "example": 1072.32
+                                        },
+                                        "loan_amount": {
+                                            "type": "number",
+                                            "example": 150000
+                                        },
+                                        "duration_months": {
+                                            "type": "integer",
+                                            "example": 180
+                                        },
+                                        "annual_rate": {
+                                            "type": "number",
+                                            "example": 3.5
+                                        },
+                                        "method": {
+                                            "type": "string",
+                                            "example": "french_amortization"
+                                        },
+                                        "currency": {
+                                            "type": "string",
+                                            "example": "EUR"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação dos parâmetros"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mortage/amortization-schedule": {
+            "post": {
+                "tags": [
+                    "Mortgage"
+                ],
+                "summary": "Gera o plano de amortização completo",
+                "description": "Lista mês a mês com juros, capital amortizado e saldo restante.",
+                "operationId": "0b4092481ceb8a20186745adddd0cf14",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "type": "number",
+                                        "example": 150000
+                                    },
+                                    "duration_years": {
+                                        "type": "integer",
+                                        "example": 15,
+                                        "nullable": true
+                                    },
+                                    "duration_months": {
+                                        "type": "integer",
+                                        "example": 180,
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "fixed",
+                                            "variable"
+                                        ],
+                                        "example": "fixed"
+                                    },
+                                    "rate": {
+                                        "type": "number",
+                                        "example": 3.5,
+                                        "nullable": true
+                                    },
+                                    "index_rate": {
+                                        "type": "number",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "spread": {
+                                        "type": "number",
+                                        "example": 1.5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Plano de amortização gerado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "loan_amount": {
+                                            "type": "number",
+                                            "example": 150000
+                                        },
+                                        "duration_months": {
+                                            "type": "integer",
+                                            "example": 180
+                                        },
+                                        "schedule": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "month": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "interest": {
+                                                        "type": "number",
+                                                        "example": 350
+                                                    },
+                                                    "principal": {
+                                                        "type": "number",
+                                                        "example": 722.32
+                                                    },
+                                                    "remaining": {
+                                                        "type": "number",
+                                                        "example": 149277.68
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mortage/calculate-spread": {
+            "post": {
+                "tags": [
+                    "Mortgage"
+                ],
+                "summary": "Calcula prestação com taxa variável (Euribor + Spread)",
+                "description": "Calcula a prestação mensal considerando index_rate + spread como TAN efetiva.",
+                "operationId": "159f801439d2e66de0e36c4e813c821b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "type",
+                                    "index_rate",
+                                    "spread"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "type": "number",
+                                        "example": 150000
+                                    },
+                                    "duration_years": {
+                                        "type": "integer",
+                                        "example": 15,
+                                        "nullable": true
+                                    },
+                                    "duration_months": {
+                                        "type": "integer",
+                                        "example": 180,
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "variable"
+                                        ],
+                                        "example": "variable"
+                                    },
+                                    "index_rate": {
+                                        "description": "Euribor (%)",
+                                        "type": "number",
+                                        "example": 2
+                                    },
+                                    "spread": {
+                                        "description": "Spread (%)",
+                                        "type": "number",
+                                        "example": 1.5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cálculo efetuado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "monthlyPayment": {
+                                            "type": "number",
+                                            "example": 1071.97
+                                        },
+                                        "annual_rate": {
+                                            "type": "number",
+                                            "example": 3.5
+                                        },
+                                        "currency": {
+                                            "type": "string",
+                                            "example": "EUR"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mortage/export": {
+            "post": {
+                "tags": [
+                    "Mortgage"
+                ],
+                "summary": "Exporta simulação em CSV",
+                "description": "Exporta o plano de amortização em formato CSV para download.",
+                "operationId": "c44103ff6d0f9c42b35cbc8ef1fba538",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "type": "number",
+                                        "example": 100000
+                                    },
+                                    "duration_years": {
+                                        "type": "integer",
+                                        "example": 10,
+                                        "nullable": true
+                                    },
+                                    "duration_months": {
+                                        "type": "integer",
+                                        "example": 120,
+                                        "nullable": true
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "fixed",
+                                            "variable"
+                                        ],
+                                        "example": "fixed"
+                                    },
+                                    "rate": {
+                                        "type": "number",
+                                        "example": 4,
+                                        "nullable": true
+                                    },
+                                    "index_rate": {
+                                        "type": "number",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "spread": {
+                                        "type": "number",
+                                        "example": 1.5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ficheiro CSV gerado com sucesso",
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação dos parâmetros"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Mortgage",
+            "description": "Mortgage"
+        }
+    ]
+}
