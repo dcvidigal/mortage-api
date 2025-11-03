@@ -1,4 +1,4 @@
-# Mortage API
+# Mortgage API
 
 Aplicação Laravel desenvolvida como caso técnico, que implementa uma **API de Cálculo de Empréstimos (Mortgage Calculator)**, com suporte a **taxas fixas e variáveis**, **geração de tabela de amortização**, **exportação de resultados**, **documentação automática (Swagger)** e **autenticação por token Bearer**.
 
@@ -16,10 +16,10 @@ Os principais endpoints disponibilizam simulações de crédito com base em par�
 
 | Endpoint | Método | Descrição |
 |-----------|---------|-----------|
-| `/api/mortage/calculate` | POST | Calcula a prestação mensal (taxa fixa ou variável) |
-| `/api/mortage/amortization-schedule` | POST | Gera a tabela de amortização (juros, capital e saldo) |
-| `/api/mortage/calculate-spread` | POST | Calcula a TAN (index rate + spread) e a prestação variável |
-| `/api/mortage/export` | POST | Exporta os resultados em formato CSV |
+| `/api/mortgage/calculate` | POST | Calcula a prestação mensal (taxa fixa ou variável) |
+| `/api/mortgage/amortization-schedule` | POST | Gera a tabela de amortização (juros, capital e saldo) |
+| `/api/mortgage/calculate-spread` | POST | Calcula a TAN (index rate + spread) e a prestação variável |
+| `/api/mortgage/export` | POST | Exporta os resultados em formato CSV |
 
 ---
 
@@ -43,7 +43,7 @@ Todos os endpoints partilham a mesma estrutura base de validação:
 
 ### Taxa Fixa
 ```json
-POST /api/mortage/calculate
+POST /api/mortgage/calculate
 {
   "loan_amount": 150000,
   "duration_years": 15,
@@ -70,7 +70,7 @@ POST /api/mortage/calculate
 
 ### Taxa Variável
 ```json
-POST /api/mortage/calculate
+POST /api/mortgage/calculate
 {
   "loan_amount": 150000,
   "duration_years": 15,
@@ -86,8 +86,8 @@ POST /api/mortage/calculate
 
 1. Clonar o repositório:
    ```bash
-   git clone https://github.com/dcvidigal/mortage-api.git
-   cd mortage-api
+   git clone https://github.com/dcvidigal/mortgage-api.git
+   cd mortgage-api
    ```
 
 2. Instalar dependências:
@@ -123,7 +123,7 @@ POST /api/mortage/calculate
 app/
 ├── Http/
 │   ├── Controllers/
-│   │   └── MortageController.php
+│   │   └── MortgageController.php
 │   ├── Middleware/
 │   │   └── ApiTokenAuth.php
 │   └── Requests/
@@ -131,14 +131,14 @@ app/
 ├── Services/
 │   └── MortgageCalculator.php
 └── Swagger/
-    └── MortageApiDocs.php
+    └── MortgageApiDocs.php
 
 routes/
 └── api.php
 
 tests/
 ├── Feature/
-│   └── MortageCalculationTest.php
+│   └── MortgageCalculationTest.php
 └── Unit/
     └── MortgageCalculatorTest.php
 ```
@@ -197,13 +197,13 @@ vendor/bin/phpunit
 ```
 
 ### Testes implementados:
-| Categoria | Ficheiro | Cobertura |
-|------------|-----------|-----------|
-| Cálculo de empréstimo fixo | `Feature/MortageCalculationTest.php` | ✅ |
-| Cálculo de empréstimo variável | `Feature/MortageCalculationTest.php` | ✅ |
-| Geração de tabela de amortização | `Feature/MortageCalculationTest.php` | ✅ |
-| Exportação CSV | `Feature/MortageCalculationTest.php` | ✅ |
-| Teste unitário do serviço de cálculo | `Unit/MortgageCalculatorTest.php` | ✅ |
+| Categoria | Ficheiro                              | Cobertura |
+|------------|---------------------------------------|-----------|
+| Cálculo de empréstimo fixo | `Feature/MortgageCalculationTest.php` | ✅ |
+| Cálculo de empréstimo variável | `Feature/MortgageCalculationTest.php` | ✅ |
+| Geração de tabela de amortização | `Feature/MortgageCalculationTest.php` | ✅ |
+| Exportação CSV | `Feature/MortgageCalculationTest.php` | ✅ |
+| Teste unitário do serviço de cálculo | `Unit/MortgageCalculatorTest.php`     | ✅ |
 
 ---
 
@@ -224,7 +224,7 @@ Exemplo (`.github/workflows/ci.yml`):
 - **Validação robusta** via `Request::validate()`, garantindo coerência entre endpoints.
 - **Autenticação leve**: middleware `ApiTokenAuth` com exceção automática para ambiente de teste.
 - **Arquitetura extensível**: endpoints e lógica facilmente adaptáveis a novos produtos financeiros.
-- **Documentação desacoplada**: Swagger definido em `app/Swagger/MortageApiDocs.php`, evitando anotações em cada controlador.
+- **Documentação desacoplada**: Swagger definido em `app/Swagger/MortgageApiDocs.php`, evitando anotações em cada controlador.
 
 ---
 
