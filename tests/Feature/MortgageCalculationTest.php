@@ -10,10 +10,11 @@ class MortgageCalculationTest extends TestCase
     /**
      * Testa amortização de taxa fixa
      */
-    public function test_fixed_rate_mortgage_calculation(): void{
+    public function test_fixed_rate_mortgage_calculation(): void
+    {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', [
             'loan_amount' => 200000,
             'duration_years' => 30,
             'rate' => 3.0,
@@ -27,7 +28,7 @@ class MortgageCalculationTest extends TestCase
                 'duration_months' => 360,
                 'annual_rate' => 3.0,
                 'method' => 'french_amortization',
-                "currency" => "EUR",
+                'currency' => 'EUR',
             ]);
     }
 
@@ -37,8 +38,8 @@ class MortgageCalculationTest extends TestCase
     public function test_variable_rate_mortgage_calculation(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', [
             'loan_amount' => 150000,
             'duration_years' => 15,
             'index_rate' => 2.0,
@@ -54,7 +55,7 @@ class MortgageCalculationTest extends TestCase
                 'duration_months' => 180,
                 'annual_rate' => 3.5,
                 'method' => 'french_amortization',
-                "currency" => "EUR",
+                'currency' => 'EUR',
             ]);
     }
 
@@ -64,8 +65,8 @@ class MortgageCalculationTest extends TestCase
     public function test_mortgage_calculation_with_invalid_parameters(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', [
             'loan_amount' => -50000,
             'duration_years' => 10,
             'rate' => 4.0,
@@ -82,8 +83,8 @@ class MortgageCalculationTest extends TestCase
     public function test_mortgage_calculation_without_duration(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', [
             'loan_amount' => 100000,
             'type' => 'fixed',
             'rate' => 5.0,
@@ -99,8 +100,8 @@ class MortgageCalculationTest extends TestCase
     public function test_mortgage_calculation_with_duration_in_months(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', [
             'loan_amount' => 50000,
             'duration_months' => 24,
             'rate' => 4.0,
@@ -114,7 +115,7 @@ class MortgageCalculationTest extends TestCase
                 'duration_months' => 24,
                 'annual_rate' => 4,
                 'method' => 'french_amortization',
-                "currency" => "EUR",
+                'currency' => 'EUR',
             ]);
     }
 
@@ -124,21 +125,22 @@ class MortgageCalculationTest extends TestCase
     public function test_mortgage_calculation_required_fields(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate', []);
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate', []);
         $response
             ->assertStatus(422)
             ->assertJsonValidationErrors(['loan_amount', 'type']);
 
     }
+
     /**
      * Testa a geração da tabela de amortização.
      */
     public function test_mortgage_amortization_schedule(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/amortization-schedule', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/amortization-schedule', [
             'loan_amount' => 10000.00,
             'duration_years' => 1,
             'rate' => 5.0,
@@ -147,7 +149,7 @@ class MortgageCalculationTest extends TestCase
 
         $response
             ->assertStatus(200)
-           ->assertJsonStructure([
+            ->assertJsonStructure([
                 'monthlyPayment',
                 'loan_amount',
                 'duration_months',
@@ -176,8 +178,8 @@ class MortgageCalculationTest extends TestCase
     public function test_variable_rate_mortgage_calculation_with_spread(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/calculate-spread', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/calculate-spread', [
             'loan_amount' => 120000,
             'duration_years' => 20,
             'index_rate' => 1.8,
@@ -188,14 +190,14 @@ class MortgageCalculationTest extends TestCase
         $response
             ->assertStatus(200)
             ->assertJson([
-               'monthlyPayment' => 665.52,
+                'monthlyPayment' => 665.52,
                 'loan_amount' => 120000.0,
                 'duration_months' => 240,
                 'index_rate' => 1.8,
                 'spread' => 1.2,
                 'annual_rate' => 3.0,
                 'method' => 'french_amortization',
-                "currency" => "EUR"
+                'currency' => 'EUR',
             ]);
     }
 
@@ -205,8 +207,8 @@ class MortgageCalculationTest extends TestCase
     public function test_mortgage_amortization_schedule_export(): void
     {
         $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . config('app.api_token'),
-    ])->postJson('/api/mortgage/export', [
+            'Authorization' => 'Bearer '.config('app.api_token'),
+        ])->postJson('/api/mortgage/export', [
             'loan_amount' => 80000.00,
             'duration_years' => 10,
             'rate' => 4.5,

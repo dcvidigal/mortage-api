@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 /**
  * @OA\PathItem(path="/api")
+ *
  * @OA\Info(
  *     title="API de Calculadora de Empréstimos",
  *     version="1.0.0",

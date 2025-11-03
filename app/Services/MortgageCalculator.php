@@ -41,7 +41,7 @@ class MortgageCalculator
 
         $remainingBalance = $loanAmmount;
         $totalInterest = 0.0;
-        for( $month = 1; $month <= $months; $month++ ) {
+        for ($month = 1; $month <= $months; $month++) {
             $interestPayment = round($remainingBalance * $monthlyRate, 2);
             $principalPayment = round($monthlyPayment - $interestPayment, 2);
             $remainingBalance = round($remainingBalance - $principalPayment, 2);

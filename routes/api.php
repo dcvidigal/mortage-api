@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MortgageController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(\App\Http\Middleware\ApiTokenAuth::class)->group(function () {
     Route::post('/mortgage/calculate', [MortgageController::class, 'calculate']);

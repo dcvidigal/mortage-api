@@ -16,9 +16,10 @@ class ApiTokenAuth
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
-        if( $token !== config('app.api_token') ) {
+        if ($token !== config('app.api_token')) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
+
         return $next($request);
     }
 }

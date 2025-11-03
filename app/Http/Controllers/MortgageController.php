@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Validation\ValidationException;
 use App\Services\MortgageCalculator;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class MortgageController extends Controller
 {
@@ -12,7 +12,7 @@ class MortgageController extends Controller
 
     public function __construct()
     {
-        $this->mortgageCalculator = new MortgageCalculator();
+        $this->mortgageCalculator = new MortgageCalculator;
     }
 
     public function calculate(Request $request)
@@ -68,17 +68,17 @@ class MortgageController extends Controller
 
         return response()->json([
             'monthlyPayment' => $scheduleData['monthly_payment'],
-            'loan_amount' => (float)$validated['loan_amount'],
+            'loan_amount' => (float) $validated['loan_amount'],
             'duration_months' => $months,
-            'annual_rate' => (float)$annualRate,
+            'annual_rate' => (float) $annualRate,
             'method' => 'french_amortization',
-            "currency" => "EUR",
-            "metadata" => [
-                "calculated_at" => now()->toIso8601String(),
-                "formula" => "M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1"
+            'currency' => 'EUR',
+            'metadata' => [
+                'calculated_at' => now()->toIso8601String(),
+                'formula' => 'M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1',
             ],
             'total_interest' => $scheduleData['total_interest'],
-            'schedule' => $scheduleData['schedule']
+            'schedule' => $scheduleData['schedule'],
         ]);
     }
 
@@ -101,8 +101,9 @@ class MortgageController extends Controller
         }
 
         $result = $this->performCalculation($validated);
-        $result['index_rate'] = $validated['type'] == 'variable' ? (float)$validated['index_rate'] : null;
-        $result['spread'] = $validated['type'] == 'variable' ? (float)$validated['spread'] : null;
+        $result['index_rate'] = $validated['type'] == 'variable' ? (float) $validated['index_rate'] : null;
+        $result['spread'] = $validated['type'] == 'variable' ? (float) $validated['spread'] : null;
+
         return response()->json($result);
     }
 
@@ -138,6 +139,7 @@ class MortgageController extends Controller
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="amortization_schedule.csv"',
         ];
+
         return response()->stream(function () use ($result) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['Mês', 'Pagamento Principal', 'Pagamento de Juros', 'Saldo Remanescente', 'Valor do Empréstimo', 'Taxa Anual', 'Taxa de Índice', 'Spread']);
@@ -153,18 +155,16 @@ class MortgageController extends Controller
                     $result['loan_amount'],
                     $result['annual_rate'],
                     $result['index_rate'] ?? '',
-                    $result['spread'] ?? ''
+                    $result['spread'] ?? '',
                 ]);
 
             }
             fclose($handle);
         }, 200, $headers);
 
-
     }
 
-    private
-    function performCalculation(array $validated): array
+    private function performCalculation(array $validated): array
     {
         $months = $validated['duration_months'] ?? $validated['duration_years'] * 12;
 
@@ -180,14 +180,14 @@ class MortgageController extends Controller
 
         return [
             'monthlyPayment' => $monthlyPayment,
-            'loan_amount' => (float)$validated['loan_amount'],
+            'loan_amount' => (float) $validated['loan_amount'],
             'duration_months' => $months,
-            'annual_rate' => (float)$annualRate,
+            'annual_rate' => (float) $annualRate,
             'method' => 'french_amortization',
-            "currency" => "EUR",
-            "metadata" => [
-                "calculated_at" => now()->toIso8601String(),
-                "formula" => "M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1"
+            'currency' => 'EUR',
+            'metadata' => [
+                'calculated_at' => now()->toIso8601String(),
+                'formula' => 'M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1',
             ],
         ];
     }
